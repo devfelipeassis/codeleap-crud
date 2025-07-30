@@ -19,6 +19,7 @@ type PostType = {
 
 type PostCardProps = {
   post: PostType;
+  currentUser: string;
   openDeleteDialog: (post: PostType) => void;
   openEditDialog: (post: PostType) => void;
 };
@@ -40,25 +41,29 @@ const mockPosts: PostType[] = [
   },
 ];
 
-const PostCard = ({ post, openDeleteDialog, openEditDialog }: PostCardProps) => {
+const PostCard = ({ post, currentUser, openDeleteDialog, openEditDialog }: PostCardProps) => {
+  const isPostAuthor = post.username === currentUser
   return (
     <Card className="rounded-lg mt-6 w-full shadow-lg overflow-hidden">
       <CardHeader className="bg-[#7695EC] p-6 text-white flex-row justify-between items-center rounded-t-lg -mt-6">
         <CardTitle className="text-xl font-bold">{post.title}</CardTitle>
-        <div className="flex space-x-4">
-          <Trash2 
-            className="cursor-pointer" 
-            size={24} 
-            color="#FFFFFF" 
-            onClick={() => openDeleteDialog(post)}
-          />
-          <SquarePen 
-            className="cursor-pointer" 
-            size={24} 
-            color="#FFFFFF" 
-            onClick={() => openEditDialog(post)}
-          />
-        </div>
+        {isPostAuthor && (
+          <div className="flex space-x-4">
+            <Trash2 
+              className="cursor-pointer" 
+              size={24} 
+              color="#FFFFFF" 
+              onClick={() => openDeleteDialog(post)}
+            />
+            <SquarePen 
+              className="cursor-pointer" 
+              size={24} 
+              color="#FFFFFF" 
+              onClick={() => openEditDialog(post)}
+            />
+          </div>
+        )}
+        
       </CardHeader>
       <CardContent className="p-6">
         <div className="flex justify-between items-center mb-4">
@@ -99,11 +104,22 @@ export default function MainPage() {
     }
 
     setTimeout(() => {
-      setPosts(mockPosts);
+      const storedPosts = localStorage.getItem('codeleap-posts');
+      if (storedPosts) {
+        setPosts(JSON.parse(storedPosts))
+      } else {
+        setPosts(mockPosts)
+      }
       setIsLoading(false);
     }, 2000)
 
   }, [router])
+
+  useEffect (() => {
+    if (posts.length > 0 || !isLoading ) {
+      localStorage.setItem('codeleap-posts', JSON.stringify(posts))
+    } 
+  }, [posts, isLoading])
 
   const handleLogout = () => {
     localStorage.removeItem('username');
@@ -222,6 +238,7 @@ export default function MainPage() {
             <PostCard 
               key={post.id} 
               post={post} 
+              currentUser={currentUser}
               openDeleteDialog={openDeleteDialog}
               openEditDialog={openEditDialog} 
             />
@@ -229,7 +246,7 @@ export default function MainPage() {
         )}
       </main>
 
-      {/* Modal de confirmação de exclusão */}
+      {/* Double Check Delete Post Modal */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
         <DialogContent className="sm:max-w-md w-[350px]">
           <DialogHeader>
@@ -254,7 +271,7 @@ export default function MainPage() {
         </DialogContent>
       </Dialog>
       
-      {/* Modal de edição */}
+      {/* Modal To Edit Posts */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="sm:max-w-md w-[700px]">
           <DialogHeader>
