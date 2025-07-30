@@ -42,8 +42,8 @@ const mockPosts: PostType[] = [
 
 const PostCard = ({ post, openDeleteDialog, openEditDialog }: PostCardProps) => {
   return (
-    <Card className="rounded-none mt-6 w-full shadow-lg">
-      <CardHeader className="bg-[#7695EC] p-6 text-white flex-row justify-between items-center rounded-t-lg">
+    <Card className="rounded-lg mt-6 w-full shadow-lg overflow-hidden">
+      <CardHeader className="bg-[#7695EC] p-6 text-white flex-row justify-between items-center rounded-t-lg -mt-6">
         <CardTitle className="text-xl font-bold">{post.title}</CardTitle>
         <div className="flex space-x-4">
           <Trash2 
@@ -56,7 +56,7 @@ const PostCard = ({ post, openDeleteDialog, openEditDialog }: PostCardProps) => 
             className="cursor-pointer" 
             size={24} 
             color="#FFFFFF" 
-            onClick={() => openEditDialog(post)} // Chama a nova função para abrir o modal de edição
+            onClick={() => openEditDialog(post)}
           />
         </div>
       </CardHeader>
@@ -74,7 +74,8 @@ const PostCard = ({ post, openDeleteDialog, openEditDialog }: PostCardProps) => 
 export default function MainPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [posts, setPosts] = useState<PostType[]>(mockPosts);
+  const [posts, setPosts] = useState<PostType[]>([]);
+  const [isLoading, setIsLoading] = useState(true) // Fake Loading Posts
   
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [postToDelete, setPostToDelete] = useState<PostType | null>(null);
@@ -90,11 +91,18 @@ export default function MainPage() {
 
   useEffect(() => {
     const storedUsername = localStorage.getItem('username');
+
     if(!storedUsername) {
       router.push('./')
     } else {
       setCurrentUser(storedUsername)
     }
+
+    setTimeout(() => {
+      setPosts(mockPosts);
+      setIsLoading(false);
+    }, 2000)
+
   }, [router])
 
   const handleLogout = () => {
@@ -205,14 +213,20 @@ export default function MainPage() {
           </CardContent>
         </Card>
 
-        {posts.map((post) => (
-          <PostCard 
-            key={post.id} 
-            post={post} 
-            openDeleteDialog={openDeleteDialog}
-            openEditDialog={openEditDialog} 
-          />
-        ))}
+        { isLoading ? (
+          <div className='flex justify-center items-center mt-8'>
+            <p className='text-lg text-gray-600'>Loading posts...</p>
+          </div>
+        ) : (
+          posts.map((post) => (
+            <PostCard 
+              key={post.id} 
+              post={post} 
+              openDeleteDialog={openDeleteDialog}
+              openEditDialog={openEditDialog} 
+            />
+          ))
+        )}
       </main>
 
       {/* Modal de confirmação de exclusão */}
