@@ -1,20 +1,31 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const [username, setUsername] = useState('');
+  const router = useRouter();
+
+  useEffect( () => {
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      router.push('/main')
+    }
+  }, [router])
 
   const handleSubmit = (event: FormEvent) => {
     event.preventDefault();
     if (username.trim() === '') {
       return;
     }
-    // Lógica para armazenar o nome de usuário
-    console.log('Username submitted:', username);
+    
+    localStorage.setItem('username', username)
+
+    router.push('./main')
   };
 
   const isButtonDisabled = username.trim() === '';
