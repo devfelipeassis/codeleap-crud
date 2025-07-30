@@ -7,7 +7,7 @@ import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Trash2, SquarePen } from 'lucide-react';
+import { Trash2, SquarePen, Heart } from 'lucide-react';
 
 type PostType = {
   id: number;
@@ -15,6 +15,7 @@ type PostType = {
   username: string;
   content: string;
   timestamp: string;
+  likes: number;
 }
 
 type PostCardProps = {
@@ -22,6 +23,8 @@ type PostCardProps = {
   currentUser: string;
   openDeleteDialog: (post: PostType) => void;
   openEditDialog: (post: PostType) => void;
+  handleLike: (id: number) => void;
+  isLiked: boolean;
 };
 
 const mockPosts: PostType[] = [
@@ -31,6 +34,7 @@ const mockPosts: PostType[] = [
     username: "Victor",
     content: "Curabitur suscipit suscipit tellus. Phasellus consectetur vestibulum elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas...",
     timestamp: "25 minutes ago",
+    likes: 5,
   },
   {
     id: 2,
@@ -38,10 +42,11 @@ const mockPosts: PostType[] = [
     username: "Vini",
     content: "Curabitur suscipit suscipit tellus. Phasellus consectetur vestibulum elit. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas...",
     timestamp: "45 minutes ago",
+    likes: 12
   },
 ];
 
-const PostCard = ({ post, currentUser, openDeleteDialog, openEditDialog }: PostCardProps) => {
+const PostCard = ({ post, currentUser, openDeleteDialog, openEditDialog, handleLike, isLiked }: PostCardProps) => {
   const isPostAuthor = post.username === currentUser
   return (
     <Card className="rounded-lg mt-6 w-full shadow-lg overflow-hidden">
@@ -71,6 +76,16 @@ const PostCard = ({ post, currentUser, openDeleteDialog, openEditDialog }: PostC
           <span className="text-gray-500 text-sm">{post.timestamp}</span>
         </div>
         <p className="text-black text-base">{post.content}</p>
+
+        {/* LIKE BUTTON */}
+        <div className="flex items-center mt-4">
+          <Heart 
+            className={`cursor-pointer transition-colors ${isLiked ? 'text-red-500 fill-red-500' : 'text-gray-400 hover:text-red-500'}`}
+            size={20}
+            onClick={() => handleLike(post.id)}
+          />
+          <span className="ml-2 text-sm text-gray-500">{post.likes}</span>
+        </div>
       </CardContent>
     </Card>
   );
@@ -93,33 +108,39 @@ export default function MainPage() {
   const router = useRouter();
 
   const [currentUser, setCurrentUser] = useState('');
-
-  useEffect(() => {
+  const [likedPosts, setLikedPosts] = useState<number[]>([])
+ 
+ useEffect(() => {
     const storedUsername = localStorage.getItem('username');
 
     if(!storedUsername) {
-      router.push('./')
+      router.push('./');
     } else {
-      setCurrentUser(storedUsername)
+      setCurrentUser(storedUsername);
+      setTimeout(() => {
+        const storedPosts = localStorage.getItem('codeleap-posts');
+        if (storedPosts) {
+          const parsedPosts = JSON.parse(storedPosts).map((post: PostType) => ({
+            ...post,
+            likes: Number(post.likes)
+          }));
+          setPosts(parsedPosts);
+        } else {
+          setPosts(mockPosts);
+        }
+        setIsLoading(false);
+      }, 2000);
     }
+  }, [router]);
 
-    setTimeout(() => {
-      const storedPosts = localStorage.getItem('codeleap-posts');
-      if (storedPosts) {
-        setPosts(JSON.parse(storedPosts))
-      } else {
-        setPosts(mockPosts)
-      }
-      setIsLoading(false);
-    }, 2000)
-
-  }, [router])
+    
 
   useEffect (() => {
     if (posts.length > 0 || !isLoading ) {
       localStorage.setItem('codeleap-posts', JSON.stringify(posts))
+      localStorage.setItem('codeleap-liked-posts', JSON.stringify(likedPosts));
     } 
-  }, [posts, isLoading])
+  }, [posts, isLoading, likedPosts])
 
   const handleLogout = () => {
     localStorage.removeItem('username');
@@ -138,6 +159,7 @@ export default function MainPage() {
       content,
       username: currentUser,
       timestamp: "Just now",
+      likes: 0,
     };
     
     setPosts([newPost, ...posts]);
@@ -178,6 +200,23 @@ export default function MainPage() {
     setPostToEdit(null);
     setEditFormTitle('');
     setEditFormContent('');
+  };
+
+    const handleLike = (id: number) => {
+
+    if (likedPosts.includes(id)) {
+     
+      setPosts(posts.map(post => 
+        post.id === id ? { ...post, likes: post.likes - 1 } : post
+      ));
+      setLikedPosts(likedPosts.filter(postId => postId !== id));
+    } else {
+     
+      setPosts(posts.map(post => 
+        post.id === id ? { ...post, likes: post.likes + 1 } : post
+      ));
+      setLikedPosts([...likedPosts, id]);
+    }
   };
 
   return (
@@ -241,6 +280,8 @@ export default function MainPage() {
               currentUser={currentUser}
               openDeleteDialog={openDeleteDialog}
               openEditDialog={openEditDialog} 
+              handleLike={handleLike}
+              isLiked={likedPosts.includes(post.id)}              
             />
           ))
         )}
