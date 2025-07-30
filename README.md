@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CodeLeap Technical Test - Frontend
 
-## Getting Started
+Este projeto é a minha solução para o teste técnico de Frontend da CodeLeap. O objetivo era criar uma aplicação simples de rede social com funcionalidades CRUD (Criar, Ler, Atualizar, Deletar).
 
-First, run the development server:
+## Tecnologias Utilizadas
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- **Next.js**: Framework para aplicações React.
+- **Tailwind CSS v4**: Framework de CSS para estilização rápida e responsiva.
+- **Shadcn/UI**: Biblioteca de componentes reutilizáveis e acessíveis, integrada ao Tailwind.
+- **TypeScript**: Linguagem de programação para garantir um código mais robusto e seguro.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Funcionalidades Implementadas
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Tela de Login
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Uma tela de login simples com um campo para o nome de usuário.
+- O botão "ENTER" fica desativado até que o campo seja preenchido.
+- O layout é responsivo para diferentes tamanhos de tela.
 
-## Learn More
+### Tela Principal (Feed)
 
-To learn more about Next.js, take a look at the following resources:
+- Um feed de posts com cabeçalho fixo.
+- Um formulário para a criação de novos posts.
+- A lista de posts é exibida em cards, com título, nome de usuário, conteúdo e tempo.
+- **Operações CRUD**:
+  - **Criar**: É possível criar novos posts usando o formulário.
+  - **Ler**: Os posts são exibidos em uma lista.
+  - **Deletar**: Ao clicar no ícone de lixeira, um modal de confirmação aparece. O post é removido da lista após a confirmação.
+  - **Atualizar**: Ao clicar no ícone de edição, um modal aparece com o título e conteúdo do post preenchidos, permitindo a alteração dos dados.
+- Os ícones de edição e exclusão estão presentes em todos os posts.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Próximos Passos (Diferenciais)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Para me destacar no teste, estou trabalhando na implementação das seguintes funcionalidades:
 
-## Deploy on Vercel
+- **Login Persistente**: Usar `localStorage` para manter o usuário logado e redirecionar entre as páginas de login e principal.
+- **Simulação de API**: Usar `useEffect` e estados de carregamento (`loading state`) para simular chamadas de API na página principal.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Como Rodar o Projeto Localmente
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Clone o repositório.
+2. Instale as dependências: `npm install`
+3. Inicie o servidor de desenvolvimento: `npm run dev`
+
+---
+
+**Autor**: Felipe Campos Assis
