@@ -8,7 +8,21 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Trash2, SquarePen } from 'lucide-react';
 
-const mockPosts = [
+type PostType = {
+  id: number;
+  title: string;
+  username: string;
+  content: string;
+  timestamp: string;
+}
+
+type PostCardProps = {
+  post: PostType;
+  openDeleteDialog: (post: PostType) => void;
+  openEditDialog: (post: PostType) => void;
+};
+
+const mockPosts: PostType[] = [
   {
     id: 1,
     title: "My First Post at CodeLeap Network!",
@@ -25,7 +39,7 @@ const mockPosts = [
   },
 ];
 
-const PostCard = ({ post, openDeleteDialog, openEditDialog }: any) => {
+const PostCard = ({ post, openDeleteDialog, openEditDialog }: PostCardProps) => {
   return (
     <Card className="rounded-none mt-6 w-full shadow-lg">
       <CardHeader className="bg-[#7695EC] p-6 text-white flex-row justify-between items-center rounded-t-lg">
@@ -59,13 +73,13 @@ const PostCard = ({ post, openDeleteDialog, openEditDialog }: any) => {
 export default function MainPage() {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
-  const [posts, setPosts] = useState(mockPosts);
+  const [posts, setPosts] = useState<PostType[]>(mockPosts);
   
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [postToDelete, setPostToDelete] = useState<any>(null);
+  const [postToDelete, setPostToDelete] = useState<PostType | null>(null);
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [postToEdit, setPostToEdit] = useState<any>(null);
+  const [postToEdit, setPostToEdit] = useState<PostType | null>(null);
   const [editFormTitle, setEditFormTitle] = useState('');
   const [editFormContent, setEditFormContent] = useState('');
 
@@ -90,7 +104,7 @@ export default function MainPage() {
     setContent('');
   };
 
-  const openDeleteDialog = (post: any) => {
+  const openDeleteDialog = (post: PostType) => {
     setPostToDelete(post);
     setIsDeleteDialogOpen(true);
   };
@@ -104,7 +118,7 @@ export default function MainPage() {
   };
 
   // Funções para a edição
-  const openEditDialog = (post: any) => {
+  const openEditDialog = (post: PostType) => {
     setPostToEdit(post);
     setEditFormTitle(post.title);
     setEditFormContent(post.content);
@@ -135,7 +149,7 @@ export default function MainPage() {
         {/* Formulário de Criação de Post */}
         <Card className="w-full shadow-lg">
           <CardHeader>
-            <CardTitle className="text-xl font-bold mb-4">What's on your mind?</CardTitle>
+            <CardTitle className="text-xl font-bold mb-4">What&apos;s on your mind?</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -174,7 +188,7 @@ export default function MainPage() {
             key={post.id} 
             post={post} 
             openDeleteDialog={openDeleteDialog}
-            openEditDialog={openEditDialog} // Passa a nova função para o componente filho
+            openEditDialog={openEditDialog} 
           />
         ))}
       </main>
