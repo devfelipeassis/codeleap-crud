@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardContent, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -83,7 +84,23 @@ export default function MainPage() {
   const [editFormTitle, setEditFormTitle] = useState('');
   const [editFormContent, setEditFormContent] = useState('');
 
-  const currentUser = "Victor";
+  const router = useRouter();
+
+  const [currentUser, setCurrentUser] = useState('');
+
+  useEffect(() => {
+    const storedUsername = localStorage.getItem('username');
+    if(!storedUsername) {
+      router.push('./')
+    } else {
+      setCurrentUser(storedUsername)
+    }
+  }, [router])
+
+  const handleLogout = () => {
+    localStorage.removeItem('username');
+    router.push('./')
+  }
 
   const isCreateFormDisabled = title.trim() === '' || content.trim() === '';
 
@@ -141,8 +158,13 @@ export default function MainPage() {
 
   return (
     <div className="min-h-screen bg-[#DDDDDD] flex flex-col items-center">
-      <header className="fixed top-0 w-full bg-[#7695EC] text-white p-6 shadow-md z-10">
+      <header className="fixed top-0 max-w-[800px] w-full bg-[#7695EC] text-white p-6 shadow-md z-10 flex justify-between items-center">
         <h1 className="text-2xl font-bold">CodeLeap Network</h1>
+        { currentUser && (
+          <Button onClick={handleLogout} className='bg-red-500 hover:bg-red-600 text-white cursor-pointer'>
+            Logout
+          </Button>
+        )}
       </header>
       
       <main className="w-full max-w-[800px] mt-24 px-4 md:px-0">
